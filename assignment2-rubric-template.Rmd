@@ -1,0 +1,295 @@
+```{r setup, include=FALSE}
+# set up code options for Rmd 
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE, eval = FALSE)
+```
+
+## Overview
+
+Present-day environmental justice may reflect legacies of injustice in the past. The United States has a long history of racial segregation which is still visible. During the 1930's the Home Owners' Loan Corporation (HOLC), as part of the New Deal, rated neighborhoods based on their perceived safety for real estate investment. Their ranking system, (A (green), B (blue), C (yellow), D (red)) was then used to block access to loans for home ownership. Colloquially known as "redlining", this practice has had widely-documented consequences not only for community wealth, but also health.^[Gee, G. C. (2008). A multilevel analysis of the relationship between institutional and individual racial discrimination and health status. American journal of public health, 98(Supplement_1), S48-S56.] Redlined neighborhoods have less greenery^[Nardone, A., Rudolph, K. E., Morello-Frosch, R., & Casey, J. A. (2021). Redlines and greenspace: the relationship between historical redlining and 2010 greenspace across the United States. Environmental health perspectives, 129(1), 017006.] and are hotter than other neighborhoods.^[Hoffman, J. S., Shandas, V., & Pendleton, N. (2020). The effects of historical housing policies on resident exposure to intra-urban heat: a study of 108 US urban areas. Climate, 8(1), 12.] 
+
+Check out coverage by the [New York Times](https://www.nytimes.com/interactive/2020/08/24/climate/racism-redlining-cities-global-warming.html).
+
+A recent study found that redlining has not only affected the environments communities are exposed to, it has also shaped our observations of biodiversity.^[Ellis-Soto, D., Chapman, M., & Locke, D. H. (2023). Historical redlining is associated with increasing geographical disparities in bird biodiversity sampling in the United States. Nature Human Behaviour, 1-9.] Community or citizen science, whereby individuals share observations of species, is generating an enormous volume of data. Ellis-Soto and co-authors found that redlined neighborhoods remain the most undersampled areas across 195 US cities. This gap is highly concerning, because conservation decisions are made based on these data.
+
+Check out coverage by [EOS](https://eos.org/articles/bird-biodiversity-reports-reflect-cities-redlined-past?utm_source=EosBuzz&mkt_tok=OTg3LUlHVC01NzIAAAGOx3ckQPpeDY3QyFKdUnBSYqILj3qLrgb_Q2lasphwcF90xEzMgjZFUo3NHsw3caXDcZe6I8D8qdVsSRr3wzhb6LKAQRgNo8ffhjieEbDwMw).
+
+
+### Data
+#### EJScreen
+We will be working with data from the United States Environmental Protection Agency's EJScreen: Environmental Justice Screening and Mapping Tool.
+
+According to the [US EPA website](https://www.epa.gov/ejscreen/purposes-and-uses-ejscreen):
+
+>This screening tool and data may be of interest to community residents or other stakeholders as they search for environmental or demographic information. It can also support a wide range of research and policy goals. The public has used EJScreen in many different locations and in many different ways.
+>
+>EPA is sharing EJScreen with the public:  
+> - to be more transparent about how we consider environmental justice in our work,  
+> - to assist our stakeholders in making informed decisions about pursuing environmental justice and,   
+> - to create a common starting point between the agency and the public when looking at issues related to environmental justice. 
+
+EJScreen provides on environmental and demographic information for the US at the Census [tract](https://en.wikipedia.org/wiki/Census_tract) and [block group](https://en.wikipedia.org/wiki/Census_block_group) levels. You will be working with block group data that has been downloaded from the [EPA site](https://www.epa.gov/ejscreen/download-ejscreen-data). To understand the associated data columns, you will need to explore the Technical Documentation and column description spreadsheet available in the data folder. I also encourage you to explore the [limitations and caveats](https://www.epa.gov/ejscreen/limitations-and-caveats-using-ejscreen) of the data.
+
+#### Mapping Inequality
+A team of researchers, led by the [Digital Scholarship Lab](https://dsl.richmond.edu/) at the University of Richmond have digitized maps and information from the HOLC as part of the [Mapping Inequality](https://dsl.richmond.edu/panorama/redlining/#loc=5/39.1/-94.58) project. 
+
+We will be working with maps of HOLC grade designations for Los Angeles. Information on the data can be found [here](https://dsl.richmond.edu/panorama/redlining/#loc=5/39.1/-94.58&text=downloads).^[Robert K. Nelson, LaDale Winling, Richard Marciano, Nathan Connolly, et al., “Mapping Inequality,” American Panorama, ed. Robert K. Nelson and Edward L. Ayers, accessed October 17, 2023, https://dsl.richmond.edu/panorama/redlining/] 
+
+#### Biodiversity observations
+The [Global Biodiversity Information Facility](gbif.org) is the largest aggregator of biodiversity observations in the world. Observations typically include a location and date that a species was observed.
+
+We will be working observations of birds from 2021 onward.
+
+
+## Assignment
+
+### Investigate the legacy of redlining in current environmental (in)justice
+```{r load-packages}
+library(tidyverse)
+library(sf)
+library(tmap)
+rm(list = ls())
+```
+
+Read in EJScreen data and filter to Los Angeles County
+(5 points)
+```{r load-data}
+# read in EJScreen data
+ejscreen <- st_read("../data/EJSCREEN_2023_BG_StatePct_with_AS_CNMI_GU_VI.gdb/") 
+
+# filter to LA county
+LA_ejscreen <- ejscreen %>%
+  filter(CNTY_NAME %in% c("Los Angeles County"))
+```
+
+Import redlining information for Los Angeles.
+
+```{r import-redlining}
+LA_redlining <- st_read("https://dsl.richmond.edu/panorama/redlining/static/downloads/geojson/CALosAngeles1939.geojson") %>% 
+  st_make_valid()
+```
+
+Find the number of census block groups that fall within areas with HOLC grades
+hint: make sure the CRS match
+(15 points)
+
+> The original prompt was vague, so multiple topological relationships could be used.
+> Below I show a few different approaches. Different topological relationships will give different answers -- they are not necessarily incorrect, they simply have different interpretations.  
+> - "intersects" returns all census block groups that overlap redlining areas (3951 CBGs).  
+> - "within" returns only census block groups that fall inside of redlining areas (887 CBGs)
+
+```{r ej-red-transform}
+
+# first transform data to same CRS
+
+# map both datasets to get a sense of their spatial pattern
+
+```
+
+#### Approach 1
+```{r ej-red1}
+# try finding the CBGs intersecting redlining data by spatial subsetting
+# the bracket operator automatically looks for "intersects"
+
+
+```
+#### Approach 2
+```{r ej-red2}
+# try using the st_intersects functions
+
+
+```
+#### Approach 3
+```{r ej-red3}
+# try using st_filter with st_intersects
+# in this case we need to define which topological relationship we want to use
+# in this case we'll try "intersects"
+
+
+```
+#### Approach 4
+```{r ej-red4}
+# approach 4
+# try using st_filter with st_within
+
+
+```
+#### Compare approaches 3 & 4
+```{r ej-red34-compare}
+# test whether approaches 3 & 4 give the same result
+# if the results don't match, compare answers
+
+
+```
+
+```{r ej-red34-map}
+# plot results from approaches 3 & 4 to investigate the difference
+
+```
+
+#### Approach 5
+```{r ej-red5}
+# try using st_join with st_intersects
+# setting left = FALSE returns an inner join
+
+# we would expect the answers from this approach to match approach 3
+
+```
+
+```{r ej-red-debug5}
+# let's try to figure out why 5 & 4 don't match
+
+# make a map of approach 5
+# the map looks normal... so what's going on?
+
+# let's check the number of unique CBGs
+
+# does this match the answer from approach 4?
+
+```
+
+#### Approach 6
+```{r ej-red6}
+# try using st_join with st_intersects
+# this time, let's set left = TRUE which returns a left join
+
+
+
+# do the number of rows match the answer from approach 3?
+
+
+# from approach 5, we figured out that maybe it's an issue with duplicate rows
+
+# does this match the answer from approach 5?
+
+
+# hmmm... what's going on?
+# remember that left joins keep all rows in the "x" dataset
+# we know that not all CBGs are in redlining zones, so maybe it's an issue with NAs
+# let's filter out all rows without HOLC grades
+
+
+# do the number of rows match the answer from approach 3?
+
+
+# but remember, the issue with the duplicates...
+
+# do the number of unique IDs match the answer from approach 3?
+
+```
+
+#### Approach 7
+```{r ej-red7}
+# try using st_join with st_within
+
+
+# we would expect this to match the answer from approach 4
+
+```
+
+> There was some confusion in interpreting the question, and some folks thought it was asking for a summary of the number of CBGs within each HOLC grade. These answers will receive full credit, but we'll walk through it to show what's different.
+
+#### Approach 8
+
+```{r ej-red8}
+# spatially join
+
+# this number is again higher because CBGs may intersect multiple areas with HOLC grades
+
+# summarize the number of CBGS within each HOLC grade
+# note: this will double count some CBGs within HOLC grades
+
+```
+
+### Investigate the legacy of redlining in biodiversity observations
+
+For bird observations from 2022 that fall within neighborhoods with HOLC grads, find the percent of observations within each redlining categories and plot results.
+hint: make sure that the bird observations have the same CRS as redlining data.
+(20 points)
+```{r load-bird-data}
+# read in bird data
+gbif <- st_read("../data/gbif-birds-LA/") %>%
+  filter(year == 2022) # filter to 2022
+
+# transform data to match CRS
+gbif <- st_transform(gbif, crs = st_crs(LA_redlining))
+```
+
+> In the previous section we saw that topological relationships can give different answers. Let's see if the same happens in this case.
+
+#### Approach 1
+```{r gbif-red1}
+# in the previous section we saw that topological relationships can give different answers
+# let's see if the same happens in this case
+
+# try st_join with st_intersects
+
+```
+
+#### Approach 2
+```{r gbif-red2}
+# approach 2
+# try st_join with st_within
+
+```
+
+#### Compare approaches 1 & 2
+```{r gbif-red12-compare}
+# the plots look similar, but let's test to see if the answers are the same
+
+
+
+if(sum(test_gbif$difference) == 0){
+  print("match!")
+}else{
+  print("doesn't match")
+}
+```
+> Now let's look at an approach that didn't work!
+
+#### Approach 3
+```{r gbif-red3}
+# find GBIF points that intersect with redlining zones
+
+# find GBIF points that intersect with each grade
+
+# store results in data frame
+
+
+
+# the plot looks different, but let's test 
+
+
+# interestingly the sum of the difference in the counts sums to zero
+# (i.e. the total count of points is the same, they're just assigned to different grades)
+
+# but the answers are different
+
+if(min(test_gbif2$difference) == 0){
+  print("match!")
+}else{
+  print("doesn't match")
+}
+
+```
+
+```{r gibf-red3-debug}
+# Let's test what's going on
+# make a map of grade A zones and points intersected with A
+ggplot() +
+  geom_sf(data = subset(LA_redlining, holc_grade == "A")) +
+  geom_sf(data = gbif_a)
+# points aren't in A grades!
+
+# let's try again filtering sf object to A first
+LA_redlining_a <- LA_redlining %>%
+  filter(holc_grade == "A")
+# and now intersect points
+gbif_a <- gbif_redlining[LA_redlining_a,]
+
+# make map again
+ggplot() +
+  geom_sf(data = subset(LA_redlining, holc_grade == "A")) +
+  geom_sf(data = gbif_a)
+# looks good!
+```
+
